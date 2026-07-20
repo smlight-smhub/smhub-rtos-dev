@@ -1,0 +1,12 @@
+smhub.hal.rpc.GetEntropyResp.random_data max_size:256
+smhub.hal.rpc.GpioConfigReq.pin_name max_size:32
+smhub.hal.rpc.GpioEdgeEvent.pin_name max_size:32
+smhub.hal.rpc.RpcCommand.pin_name max_size:32
+smhub.hal.rpc.RpcCommand.status_msg max_size:64
+smhub.hal.rpc.MacAddressResp.mac max_size:6
+smhub.hal.rpc.PrefSaveReq.data max_size:4096
+smhub.hal.rpc.PrefLoadResp.data max_size:4096
+smhub.hal.rpc.ApiConfigSync.noise_psk max_size:32
+smhub.hal.rpc.ApiFrame.frame_data max_size:512
+smhub.hal.rpc.LightRequest.effect max_size:32
+smhub.hal.rpc.BuzzerRequest.song max_size:256

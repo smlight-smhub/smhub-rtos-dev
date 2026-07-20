@@ -1,0 +1,20 @@
+{
+  "name": "framework-sg2000-rtos",
+  "version": "1.0.0",
+  "description": "SG2000 FreeRTOS SDK Framework",
+  "keywords": [
+    "framework",
+    "rtos",
+    "sg2000"
+  ],
+  "author": {
+    "name": "Tim Lunn",
+    "email": "tl@smlight.tech"
+  },
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smlight-smhub/framework-sg2000-rtos.git"
+  },
+  "type": "framework"
+}

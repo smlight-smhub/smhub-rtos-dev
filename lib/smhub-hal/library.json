@@ -1,0 +1,18 @@
+{
+  "name": "smhub-hal",
+  "version": "1.0.0",
+  "build": {
+    "flags": [
+      "-Icommon/include",
+      "-Icommon/include/riscv64",
+      "-Idriver/include",
+      "-Ihal/cv181x/include",
+      "-Iarch/include"
+    ],
+    "srcFilter": [
+      "+<*>",
+      "-<driver/dummy.c>",
+      "-<hal/cv181x/dummy.c>"
+    ]
+  }
+}

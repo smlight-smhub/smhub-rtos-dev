@@ -1,0 +1,59 @@
+name: release-framework
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout framework repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Set version env
+        run: |
+          # If triggered by workflow_dispatch, github.ref_name will be the branch name (e.g. main).
+          # For tags, it will be the tag name (e.g. v1.0.0).
+          echo "FRAMEWORK_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+          
+      - name: Bundle Framework Archive
+        run: |
+          VERSION=${{ env.FRAMEWORK_TAG }}
+          # Remove git metadata to save space (submodules use files for .git)
+          find . -name ".git" -exec rm -rf {} + || true
+          find . -name ".gitmodules" -type f -delete || true
+          
+          # Create the bundle
+          cd ..
+          tar -cJf framework-sg2000-rtos-${VERSION}.tar.xz framework-sg2000-rtos
+          mv framework-sg2000-rtos-${VERSION}.tar.xz framework-sg2000-rtos/
+
+      - name: Upload Framework Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: framework-sg2000-rtos-${{ env.FRAMEWORK_TAG }}
+          path: framework-sg2000-rtos-${{ env.FRAMEWORK_TAG }}.tar.xz
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Framework Artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: framework-sg2000-rtos-${{ github.ref_name }}
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Release ${{ github.ref_name }}
+          files: framework-sg2000-rtos-${{ github.ref_name }}.tar.xz
+          body: "Automated framework release."

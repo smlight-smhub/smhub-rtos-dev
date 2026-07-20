@@ -1,0 +1,12 @@
+[submodule "lib/open-amp"]
+	path = lib/open-amp
+	url = https://github.com/smlight-smhub/open-amp.git
+[submodule "lib/libmetal"]
+	path = lib/libmetal
+	url = https://github.com/smlight-smhub/libmetal.git
+[submodule "lib/FreeRTOS-Kernel"]
+	path = lib/FreeRTOS-Kernel
+	url = https://github.com/smlight-smhub/FreeRTOS-Kernel.git
+[submodule "lib/nanopb"]
+	path = lib/nanopb
+	url = https://github.com/smlight-smhub/nanopb.git

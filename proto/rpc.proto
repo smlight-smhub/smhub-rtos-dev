@@ -1,0 +1,154 @@
+syntax = "proto3";
+
+package smhub.hal.rpc;
+
+enum CommandType {
+  GPIO_TOGGLE = 0;
+  MAILBOX_STATUS = 1;
+  GPIO_CONFIG = 2;
+  GPIO_EDGE_EVENT = 3;
+  GET_ENTROPY_REQ = 4;
+  GET_ENTROPY_RESP = 5;
+  TIME_SYNC = 6;
+  RESTART_REQ = 7;
+  MAC_ADDRESS_REQ = 8;
+  MAC_ADDRESS_RESP = 9;
+  PREF_SAVE_REQ = 10;
+  PREF_LOAD_REQ = 11;
+  PREF_LOAD_RESP = 12;
+  API_CONFIG_SYNC = 13;
+  API_FRAME_TX = 14;
+  API_FRAME_RX = 15;
+  GET_TIME_REQ = 16;
+  GET_TIME_RESP = 17;
+  SWITCH_CONTROL = 18;
+  LIGHT_CONTROL = 19;
+  BUZZER_CONTROL = 20;
+}
+
+message GpioConfigReq {
+  string pin_name = 1;
+  int32 mode = 2; // 0 = INPUT, 1 = OUTPUT
+  int32 edge = 3; // 0 = NONE, 1 = RISING, 2 = FALLING, 3 = BOTH
+  int32 bias = 4; // 0 = DEFAULT, 1 = PULL_UP, 2 = PULL_DOWN
+}
+
+message GpioEdgeEvent {
+  string pin_name = 1;
+  bool new_state = 2;
+}
+
+message GetEntropyReq {
+  int32 requested_size = 1;
+}
+
+message GetEntropyResp {
+  bytes random_data = 1;
+}
+
+message TimeSync {
+  uint32 epoch_seconds = 1;
+}
+
+message MacAddressResp {
+  bytes mac = 1;
+}
+
+message PrefSaveReq {
+  uint32 hash = 1;
+  bytes data = 2;
+}
+
+message PrefLoadReq {
+  uint32 hash = 1;
+}
+
+message PrefLoadResp {
+  uint32 hash = 1;
+  bytes data = 2;
+}
+
+message ApiConfigSync {
+  bytes noise_psk = 1; // 32 bytes
+  int32 port = 2;
+  string device_name = 3;
+}
+
+message ApiFrame {
+  bytes frame_data = 1;
+}
+
+message GetTimeReq {
+}
+
+message GetTimeResp {
+  uint64 epoch_seconds = 1;
+  uint32 microseconds = 2;
+}
+
+message SwitchRequest {
+  uint32 key = 1;
+  bool state = 2;
+}
+
+message LightRequest {
+  uint32 key = 1;
+  bool state = 2;
+  bool has_brightness = 3;
+  float brightness = 4;
+  bool has_rgb = 5;
+  float red = 6;
+  float green = 7;
+  float blue = 8;
+  string effect = 9;
+}
+
+message BuzzerRequest {
+  string song = 1;
+}
+
+message RpcCommand {
+  CommandType type = 1;
+
+  // GPIO_TOGGLE payload
+  string pin_name = 2;
+  bool state = 3;
+
+  // MAILBOX_STATUS payload
+  int32 mailbox_id = 4;
+  string status_msg = 5;
+
+  // GPIO_INPUT payloads
+  GpioConfigReq gpio_config = 6;
+  GpioEdgeEvent gpio_edge = 7;
+
+  // ENTROPY payloads
+  GetEntropyReq entropy_req = 8;
+  GetEntropyResp entropy_resp = 9;
+
+  // TIME payloads
+  TimeSync time_sync = 10;
+  GetTimeReq time_req = 17;
+  GetTimeResp time_resp = 18;
+
+  // SYSTEM payloads
+  MacAddressResp mac_address_resp = 11;
+
+  // PREFERENCES payloads
+  PrefSaveReq pref_save_req = 12;
+  PrefLoadReq pref_load_req = 13;
+  PrefLoadResp pref_load_resp = 14;
+
+  // API routing payloads
+  ApiConfigSync api_config = 15;
+  ApiFrame api_frame = 16;
+
+  // SWITCH_CONTROL payload
+  SwitchRequest switch_req = 19;
+
+  // LIGHT_CONTROL payload
+  LightRequest light_req = 20;
+
+  // BUZZER_CONTROL payload
+  BuzzerRequest buzzer_req = 21;
+}
