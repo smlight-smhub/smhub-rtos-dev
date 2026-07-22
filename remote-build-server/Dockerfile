@@ -6,6 +6,7 @@ RUN pip install uv
 RUN uv pip install --system --force-reinstall git+https://github.com/smlight-smhub/esphome.git@dev
 
 RUN uv pip install --system git+https://github.com/smlight-smhub/device-builder.git@main
+RUN uv pip install --system grpcio-tools
 
 # Create a volume for persistent configuration (pairing keys)
 VOLUME /config
