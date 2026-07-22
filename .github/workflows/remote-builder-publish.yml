@@ -7,6 +7,10 @@ on:
     paths:
       - 'remote-build-server/**'
       - '.github/workflows/remote-builder-publish.yml'
+  pull_request:
+    paths:
+      - 'remote-build-server/**'
+      - '.github/workflows/remote-builder-publish.yml'
   workflow_dispatch:
 
 env:
@@ -57,18 +61,20 @@ jobs:
           file: ./remote-build-server/Dockerfile
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=${{ github.event_name != 'pull_request' }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache-${{ matrix.arch }}
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache-${{ matrix.arch }},mode=max
 
       - name: Export digest
+        if: github.event_name != 'pull_request'
         run: |
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${digest#sha256:}"
 
       - name: Upload digest
-        uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v7
         with:
           name: digests-${{ matrix.arch }}
           path: /tmp/digests/*
@@ -77,13 +83,14 @@ jobs:
 
   merge:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
     needs: build-and-push
     permissions:
       contents: read
       packages: write
     steps:
       - name: Download digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: digests-*
           merge-multiple: true
