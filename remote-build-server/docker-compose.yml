@@ -1,0 +1,25 @@
+services:
+  remote-builder:
+    build: .
+    container_name: smhub-remote-builder
+    restart: unless-stopped
+    volumes:
+      # Mount a local folder to /config so that the cryptographic pairing key is persistent.
+      # This ensures you only ever have to pair the dashboard once!
+      - ./config:/config
+    ports:
+      # Expose the Noise-XX peer-link port.
+      - "6055:6055"
+      
+    # -------------------------------------------------------------------------
+    # OPTIONAL: mDNS Auto-Discovery (Linux Only)
+    # -------------------------------------------------------------------------
+    # If you are running this on a native Linux server, you can uncomment 
+    # the line below. This allows the container to share the host's network stack,
+    # meaning the remote builder will automatically show up in your SMHUB dashboard
+    # without you having to manually type the IP address.
+    #
+    # (Note: 'network_mode: host' is ignored on Docker Desktop for Windows/Mac, 
+    # so just leave this commented out and manually type your computer's IP instead).
+    # -------------------------------------------------------------------------
+    # network_mode: host
