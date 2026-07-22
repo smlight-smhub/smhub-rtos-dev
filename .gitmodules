@@ -1,0 +1,18 @@
+[submodule "src/esphome"]
+	path = src/esphome
+	url = https://github.com/smlight-smhub/esphome.git
+[submodule "src/platform-sg2000"]
+	path = src/platform-sg2000
+	url = https://github.com/smlight-smhub/platform-sg2000.git
+[submodule "src/framework-sg2000-rtos"]
+	path = src/framework-sg2000-rtos
+	url = https://github.com/smlight-smhub/framework-sg2000-rtos.git
+[submodule "src/device-builder"]
+	path = src/device-builder
+	url = https://github.com/smlight-smhub/device-builder.git
+[submodule "src/device-builder-frontend"]
+	path = src/device-builder-frontend
+	url = https://github.com/smlight-smhub/device-builder-frontend.git
+[submodule "src/rtos-config"]
+	path = src/rtos-config
+	url = https://github.com/smlight-smhub/rtos-config.git

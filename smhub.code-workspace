@@ -1,0 +1,26 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "src/esphome"
+    },
+    {
+      "path": "src/platform-sg2000"
+    },
+    {
+      "path": "src/framework-sg2000-rtos"
+    },
+    {
+      "path": "src/device-builder"
+    },
+    {
+      "path": "src/device-builder-frontend"
+    },
+    {
+      "path": "src/rtos-config"
+    }
+  ],
+  "settings": {}
+}

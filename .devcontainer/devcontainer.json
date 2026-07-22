@@ -1,0 +1,47 @@
+{
+  "name": "SMHUB ESPHome Workspace (Core Dev)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "esphome",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/smhub-rtos-dev,type=bind,consistency=cached",
+  "workspaceFolder": "/workspaces/smhub-rtos-dev",
+  "postStartCommand": "bash .devcontainer/bootstrap.sh",
+  "mounts": [
+    "source=platformio-cache,target=/home/esphome/.platformio,type=volume"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "timonwong.shellcheck",
+        "esbenp.prettier-vscode",
+        "ms-python.python",
+        "ms-python.pylint",
+        "ms-python.flake8",
+        "astral-sh.ruff",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "redhat.vscode-yaml",
+        "ms-vscode.cpptools",
+        "editorconfig.editorconfig"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/home/esphome/.local/esphome-venv/bin/python",
+        "python.terminal.activateEnvironment": false,
+        "python.languageServer": "Pylance",
+        "[python]": {
+          "editor.defaultFormatter": "astral-sh.ruff",
+          "editor.formatOnSave": true
+        },
+        "yaml.customTags": [
+          "!lambda scalar",
+          "!secret scalar",
+          "!include scalar",
+          "!file scalar",
+          "!env_variable scalar"
+        ]
+      }
+    }
+  }
+}

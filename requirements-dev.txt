@@ -1,0 +1,5 @@
+# Install ESPHome core locally for development
+-e src/esphome
+
+# Install Device Builder frontend wrapper
+-e src/device-builder
