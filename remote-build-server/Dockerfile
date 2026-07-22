@@ -1,11 +1,12 @@
-FROM ghcr.io/esphome/esphome:latest
+FROM ghcr.io/esphome/esphome:dev
 
-# Install uv for fast python package installation
 RUN pip install uv
 
-# Install the device-builder package from the main branch
-# (This provides the headless remote-build-only server capabilities)
+# Overwrite the upstream ESPHome package with the custom SMHUB fork (which contains the sg2000 platform)
+RUN uv pip install --system --force-reinstall git+https://github.com/smlight-smhub/esphome.git@dev
+
 RUN uv pip install --system git+https://github.com/smlight-smhub/device-builder.git@main
+RUN uv pip install --system grpcio-tools
 
 # Create a volume for persistent configuration (pairing keys)
 VOLUME /config
