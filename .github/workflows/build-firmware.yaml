@@ -1,0 +1,93 @@
+name: Build ESPHome Firmware
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/esphome/docker-base:debian-2026.06.1
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Install dependencies
+        run: |
+          apt-get update && apt-get install -y curl protobuf-compiler
+          pip install uv platformio --break-system-packages || pip install uv platformio
+          uv venv /opt/venv
+          export PATH="/opt/venv/bin:$PATH"
+          echo "/opt/venv/bin" >> $GITHUB_PATH
+          uv pip install -e src/esphome
+
+      - name: Pre-stage PlatformIO overrides
+        run: |
+          cat <<EOF > src/esphome/platformio_override.ini
+          [env:rtos-smhub]
+          platform = symlink://$GITHUB_WORKSPACE/src/platform-sg2000
+          platform_packages =
+              framework-sg2000-rtos @ symlink://$GITHUB_WORKSPACE/src/framework-sg2000-rtos
+
+          [env:rtos-nano]
+          platform = symlink://$GITHUB_WORKSPACE/src/platform-sg2000
+          platform_packages =
+              framework-sg2000-rtos @ symlink://$GITHUB_WORKSPACE/src/framework-sg2000-rtos
+          EOF
+          mkdir -p .git/modules/src/esphome/info && touch .git/modules/src/esphome/info/exclude
+          grep -q "^platformio_override.ini$" .git/modules/src/esphome/info/exclude 2>/dev/null || echo "platformio_override.ini" >> .git/modules/src/esphome/info/exclude
+
+      - name: Compile smhub-esphome
+        run: esphome compile src/rtos-config/smhub-esphome.yaml
+
+      - name: Compile nano-esphome
+        run: esphome compile src/rtos-config/nano-esphome.yaml
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir -p output
+          
+          # Copy SMHUB firmware
+          SMHUB_PIO="src/rtos-config/.esphome/build/rtos-smhub/.pioenvs/rtos-smhub"
+          if [ -d "$SMHUB_PIO" ]; then
+            cp "$SMHUB_PIO/program.elf" output/smhub-rtos.elf || true
+            cp "$SMHUB_PIO/program_debug.elf" output/smhub-rtos_debug.elf || true
+            cp "$SMHUB_PIO/program.bin" output/smhub-rtos.bin || true
+          fi
+          
+          # Copy NANO firmware
+          NANO_PIO="src/rtos-config/.esphome/build/rtos-nano/.pioenvs/rtos-nano"
+          if [ -d "$NANO_PIO" ]; then
+            cp "$NANO_PIO/program.elf" output/nano-rtos.elf || true
+            cp "$NANO_PIO/program_debug.elf" output/nano-rtos_debug.elf || true
+            cp "$NANO_PIO/program.bin" output/nano-rtos.bin || true
+          fi
+
+      - name: Upload Build Artifacts (Job Artifacts)
+        uses: actions/upload-artifact@v7
+        with:
+          name: smhub-rtos-firmware
+          path: output/
+          if-no-files-found: error
+
+      - name: Create GitHub Release and Upload Binaries
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            output/smhub-rtos.bin
+            output/smhub-rtos.elf
+            output/nano-rtos.bin
+            output/nano-rtos.elf
+          generate_release_notes: true
