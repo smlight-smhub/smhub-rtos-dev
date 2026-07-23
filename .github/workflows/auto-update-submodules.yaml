@@ -1,0 +1,38 @@
+name: Auto Update Submodules
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  repository_dispatch:
+    types: [trigger-submodule-update]
+  workflow_dispatch:
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          ref: dev
+          submodules: true
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Update Submodules
+        run: |
+          # Fetch latest commits from tracked branches
+          git submodule update --remote --recursive
+
+      - name: Check for changes and commit
+        run: |
+          git config --global user.name "smlight-bot"
+          git config --global user.email "smlight-bot@users.noreply.github.com"
+          
+          if git diff --quiet; then
+            echo "No submodule updates found."
+          else
+            echo "Submodules updated. Committing changes..."
+            git commit -am "chore: auto-update submodules"
+            git push origin dev
+          fi
