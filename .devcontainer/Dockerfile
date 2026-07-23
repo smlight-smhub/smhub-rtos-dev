@@ -8,14 +8,20 @@ RUN apt update \
     && apt install -y curl \
     && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt install -y \
+      bash-completion \
       protobuf-compiler \
-      nodejs
+      nodejs \
+      vim \
+      less \
+      git-delta
 
 RUN pip install uv
 
 RUN useradd esphome -m || true
 
 USER esphome
+WORKDIR /home/esphome
+
 ENV VIRTUAL_ENV=/home/esphome/.local/esphome-venv
 ENV UV_SYSTEM_PYTHON=false
 RUN uv venv $VIRTUAL_ENV

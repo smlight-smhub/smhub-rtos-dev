@@ -1,6 +1,6 @@
 services:
   remote-builder:
-    build: .
+    image: ghcr.io/smlight-smhub/smhub-addons/remote-builder:latest
     container_name: smhub-remote-builder
     restart: unless-stopped
     volumes:
