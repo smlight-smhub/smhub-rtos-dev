@@ -57,3 +57,28 @@ jobs:
           name: Release ${{ github.ref_name }}
           files: framework-sg2000-rtos-${{ github.ref_name }}.tar.xz
           body: "Automated framework release."
+
+      - name: Checkout platform-sg2000
+        uses: actions/checkout@v4
+        with:
+          repository: smlight-smhub/platform-sg2000
+          token: ${{ secrets.GH_TOKEN }}
+          path: platform-sg2000
+
+      - name: Update platform.json
+        run: |
+          cd platform-sg2000
+          FRAMEWORK_TAG="${{ github.ref_name }}"
+          PLATFORM_VERSION="${FRAMEWORK_TAG#v}"
+
+          jq --arg url "https://github.com/smlight-smhub/framework-sg2000-rtos/releases/download/${FRAMEWORK_TAG}/framework-sg2000-rtos-${FRAMEWORK_TAG}.tar.xz" \
+             --arg ver "$PLATFORM_VERSION" \
+             '.packages["framework-sg2000-rtos"].version = $url | .version = $ver' platform.json > platform.json.tmp
+          mv platform.json.tmp platform.json
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          repository: platform-sg2000
+          commit_message: "Update framework and platform version to ${{ github.ref_name }}"
+          tagging_message: "${{ github.ref_name }}"
